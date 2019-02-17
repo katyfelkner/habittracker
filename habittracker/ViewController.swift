@@ -10,19 +10,9 @@ import UIKit
 import CoreData
 
 class ViewController: UIViewController {
-    @IBOutlet weak var slider: UISlider!
-    
-    let mood: Int
-    let step: Int = 1
+
     
     
-    @IBAction func sliderValueChanged (sender: UISlider){
-        let step = int(sender.value / step) * step
-        sender.value = step
-        
-        
-    }
-   
     
     // array of all the days
     // for now we are loading them all into memory but this may become too big
@@ -30,6 +20,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // TODO: put in a title
+    
         
        
     }
@@ -62,10 +53,8 @@ class ViewController: UIViewController {
         // should be called whenever tracking for a new day is initiated
         // returns object for that day
         // this object is then passed to other methods to add data to the day
-        guard let appDelegate =
-            UIApplication.shared.delegate as? AppDelegate else {
-                return nil
-        }
+        //guard let appDelegate =
+            //UIApplication.shared.delegate as! AppDelegate
         
         // 1
         let managedContext =
