@@ -817,33 +817,28 @@ class ViewController: UIViewController {
     }
 
     @IBAction func moodValue(_ sender: UISegmentedControl) {
-        //        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        if let todaysDay = today {
-            addMoodNum(today: todaysDay, mood: sender.selectedSegmentIndex + 1)
-        }
+        addMoodNum(mood: sender.selectedSegmentIndex + 1)
+    
     }
     
     @IBAction func showerTracker(_ sender: UISegmentedControl) {
-        if let todaysDay = today {
-            if sender.selectedSegmentIndex == 0 {
-                addShower(today: todaysDay, shower: false)
-            }
-            else {
-                addShower(today: todaysDay, shower: true)
-            }
+        if sender.selectedSegmentIndex == 0 {
+            addShower(shower: false)
+        }
+        else {
+            addShower(shower: true)
         }
     }
     
     @IBAction func bedTracker(_ sender: UISegmentedControl) {
-        if let todaysDay = today {
-            if sender.selectedSegmentIndex == 0 {
-                addShower(today: todaysDay, makeBed: false)
-            }
-            else {
-                addShower(today: todaysDay, makeBed: true)
-            }
+        if sender.selectedSegmentIndex == 0 {
+            addShower(makeBed: false)
+        }
+        else {
+            addShower(makeBed: true)
     }
-    
+    }
+
     
     
 
