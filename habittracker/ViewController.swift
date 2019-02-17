@@ -11,8 +11,16 @@ import CoreData
 
 class ViewController: UIViewController {
 
+    @IBOutlet weak var mood: UISegmentedControl!
+    var today: NSManagedObject?
     
     
+    @IBAction func moodValue(_ sender: UISegmentedControl) {
+//        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        if let todaysDay = today {
+            addMoodNum(today: todaysDay, mood: sender.selectedSegmentIndex + 1)
+        }
+    }
     
     // array of all the days
     // for now we are loading them all into memory but this may become too big
@@ -27,7 +35,7 @@ class ViewController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
+        self.today = newDay()
         //1
         guard let appDelegate =
             UIApplication.shared.delegate as? AppDelegate else {
@@ -47,6 +55,7 @@ class ViewController: UIViewController {
         } catch let error as NSError {
             print("Could not fetch. \(error), \(error.userInfo)")
         }
+//        mood.addTarget(self, action: #selector(self.moodValue(_:)), for: .valueChanged)
     }
     
     func newDay() -> NSManagedObject {
@@ -55,7 +64,7 @@ class ViewController: UIViewController {
         // this object is then passed to other methods to add data to the day
         //guard let appDelegate =
             //UIApplication.shared.delegate as! AppDelegate
-        
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
         // 1
         let managedContext =
             appDelegate.persistentContainer.viewContext
@@ -83,7 +92,7 @@ class ViewController: UIViewController {
     }
     
     // add a numerical mood entry to an existing day
-    func addMoodNum(today: NSManagedObject, mood: int_fast16_t) {
+    func addMoodNum(today: NSManagedObject, mood: Int) {
         
         guard let appDelegate =
             UIApplication.shared.delegate as? AppDelegate else {
