@@ -11,17 +11,14 @@ import CoreData
 
 class ViewController: UIViewController {
 
-    @IBOutlet weak var slider: UISlider!
+    @IBOutlet weak var mood: UISegmentedControl!
+    var today: NSManagedObject?
     
-    let mood: Int = 0
-    let step: Int = 1
-    
-    
-    @IBAction func sliderValueChanged (sender: UISlider){
-        let step = Int(sender.value / Float(self.step)) * self.step
-        sender.value = Float(step)
-        
-        
+    @IBAction func moodValue(_ sender: UISegmentedControl) {
+//        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        if let todaysDay = today {
+            addMoodNum(today: todaysDay, mood: sender.selectedSegmentIndex + 1)
+        }
     }
    
     
@@ -36,14 +33,14 @@ class ViewController: UIViewController {
        
     }
 
-    override func viewWillAppear(_ animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
         //1
         guard let appDelegate =
             UIApplication.shared.delegate as? AppDelegate else {
                 return
         }
+        self.today = newDay()
         
         let managedContext =
             appDelegate.persistentContainer.viewContext
@@ -58,26 +55,30 @@ class ViewController: UIViewController {
         } catch let error as NSError {
             print("Could not fetch. \(error), \(error.userInfo)")
         }
+//        mood.addTarget(self, action: #selector(self.moodValue(_:)), for: .valueChanged)
     }
     
-    func newDay() -> NSManagedObject {
+    func newDay() -> NSManagedObject? {
         // should be called whenever tracking for a new day is initiated
         // returns object for that day
         // this object is then passed to other methods to add data to the day
 
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
 
-        //guard let appDelegate =
-            //UIApplication.shared.delegate as! AppDelegate
+        guard let appDelegate = UIApplication.shared.delegate as! AppDelegate? else {
+            return nil
+        }
         
         // 1
-        let managedContext =
-            appDelegate.persistentContainer.viewContext
+        let managedContext = appDelegate.persistentContainer.viewContext
+        
+        if NSEntityDescription.entity(forEntityName: "Day", in: managedContext) == nil {
+            NSEntityDescription.insertNewObject(forEntityName: "Day", into: managedContext)
+        }
         
         // 2
-        let entity =
-            NSEntityDescription.entity(forEntityName: "Day",
-                                       in: managedContext)!
+        guard let entity = NSEntityDescription.entity(forEntityName: "Day", in: managedContext) else {
+            return nil
+        }
         
         let today = NSManagedObject(entity: entity,
                                     insertInto: managedContext)
