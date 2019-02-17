@@ -10,17 +10,14 @@ import UIKit
 import CoreData
 
 class ViewController: UIViewController {
+   
 
     @IBOutlet weak var mood: UISegmentedControl!
+    @IBOutlet weak var shower: UISegmentedControl!
+    
     var today: NSManagedObject?
     
-    @IBAction func moodValue(_ sender: UISegmentedControl) {
-//        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        if let todaysDay = today {
-            addMoodNum(today: todaysDay, mood: sender.selectedSegmentIndex + 1)
-        }
-    }
-   
+    
     
     // array of all the days
     // for now we are loading them all into memory but this may become too big
@@ -505,7 +502,34 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
 
-
+    @IBAction func moodValue(_ sender: UISegmentedControl) {
+        //        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        if let todaysDay = today {
+            addMoodNum(today: todaysDay, mood: sender.selectedSegmentIndex + 1)
+        }
+    }
+    
+    @IBAction func showerTracker(_ sender: UISegmentedControl) {
+        if let todaysDay = today {
+            if sender.selectedSegmentIndex == 0 {
+                addShower(today: todaysDay, shower: false)
+            }
+            else {
+                addShower(today: todaysDay, shower: true)
+            }
+        }
+    }
+    
+    @IBAction func bedTracker(_ sender: UISegmentedControl) {
+        if let todaysDay = today {
+            if sender.selectedSegmentIndex == 0 {
+                addShower(today: todaysDay, makeBed: false)
+            }
+            else {
+                addShower(today: todaysDay, makeBed: true)
+            }
+    }
+    
     
     
 
@@ -514,3 +538,9 @@ class ViewController: UIViewController {
     // all these functions control the back end of the app - updating CoreData table
 }
 
+class TrackerViewController: UIViewController {
+    @IBOutlet weak var label: UILabel!
+    @IBAction func stepperPressed(_ stepper: UIStepper) {
+        label.text = String (stepper.value)
+}
+}
