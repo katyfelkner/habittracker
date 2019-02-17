@@ -14,13 +14,13 @@ class ViewController: UIViewController {
     @IBOutlet weak var mood: UISegmentedControl!
     var today: NSManagedObject?
     
-    
     @IBAction func moodValue(_ sender: UISegmentedControl) {
 //        let appDelegate = UIApplication.shared.delegate as! AppDelegate
         if let todaysDay = today {
             addMoodNum(today: todaysDay, mood: sender.selectedSegmentIndex + 1)
         }
     }
+   
     
     // array of all the days
     // for now we are loading them all into memory but this may become too big
@@ -33,14 +33,14 @@ class ViewController: UIViewController {
        
     }
 
-    override func viewWillAppear(_ animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.today = newDay()
         //1
         guard let appDelegate =
             UIApplication.shared.delegate as? AppDelegate else {
                 return
         }
+        self.today = newDay()
         
         let managedContext =
             appDelegate.persistentContainer.viewContext
@@ -58,21 +58,22 @@ class ViewController: UIViewController {
 //        mood.addTarget(self, action: #selector(self.moodValue(_:)), for: .valueChanged)
     }
     
-    func newDay() -> NSManagedObject {
+    func newDay() -> NSManagedObject? {
         // should be called whenever tracking for a new day is initiated
         // returns object for that day
         // this object is then passed to other methods to add data to the day
-        //guard let appDelegate =
-            //UIApplication.shared.delegate as! AppDelegate
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         // 1
-        let managedContext =
-            appDelegate.persistentContainer.viewContext
+        let managedContext = appDelegate.persistentContainer.viewContext
+        
+        if NSEntityDescription.entity(forEntityName: "Day", in: managedContext) == nil {
+            NSEntityDescription.insertNewObject(forEntityName: "Day", into: managedContext)
+        }
         
         // 2
-        let entity =
-            NSEntityDescription.entity(forEntityName: "Day",
-                                       in: managedContext)!
+        guard let entity = NSEntityDescription.entity(forEntityName: "Day", in: managedContext) else {
+            return nil
+        }
         
         let today = NSManagedObject(entity: entity,
                                     insertInto: managedContext)
@@ -115,7 +116,7 @@ class ViewController: UIViewController {
     }
     
     // add a comma separated string of qualitative mood data for a certain day
-    func addMoodString                                                                                                   (today: NSManagedObject, moodStr: String) {
+    func addMoodString (today: NSManagedObject, moodStr: String) {
         
         // TODO: need a better way to manage all this
         guard let appDelegate =
@@ -139,7 +140,7 @@ class ViewController: UIViewController {
     }
     
     // add amount of water consumed (in ounces)
-    func addWater                                                                                                   (today: NSManagedObject, water: int_fast16_t) {
+    func addWater (today: NSManagedObject, water: Int) {
         
         // TODO: need a better way to manage all this
         guard let appDelegate =
@@ -162,58 +163,8 @@ class ViewController: UIViewController {
         
     }
     
-    // add wake up time in as a Date object
-    func addWakeTime                                                                                                  (today: NSManagedObject, wakeTime: Date) {
-        
-        // TODO: need a better way to manage all this
-        guard let appDelegate =
-            UIApplication.shared.delegate as? AppDelegate else {
-                return
-        }
-        
-        let managedContext =
-            appDelegate.persistentContainer.viewContext
-        
-        // 3
-        today.setValue(NSDate(timeInterval:TimeInterval(0), since: wakeTime), forKeyPath: "wakeUpTime")
-        
-        do {
-            try managedContext.save()
-            //days.append(today)
-            // TODO: should we deal with an array in local memory here?
-        } catch let error as NSError {
-            print("Could not save. \(error), \(error.userInfo)")
-        }
-        
-    }
-    
-    // add bed time as a Date object
-    func addBedTime                                                                                                  (today: NSManagedObject, bedTime: Date) {
-        
-        // TODO: need a better way to manage all this
-        guard let appDelegate =
-            UIApplication.shared.delegate as? AppDelegate else {
-                return
-        }
-        
-        let managedContext =
-            appDelegate.persistentContainer.viewContext
-        
-        // 3
-        today.setValue(NSDate(timeInterval:TimeInterval(0), since: bedTime), forKeyPath: "bedtime")
-        
-        do {
-            try managedContext.save()
-            //days.append(today)
-            // TODO: should we deal with an array in local memory here?
-        } catch let error as NSError {
-            print("Could not save. \(error), \(error.userInfo)")
-        }
-        
-    }
-    
     // add a boolean - did user socialize?
-    func addSocialize                                                                                                  (today: NSManagedObject, social: boolean_t) {
+    func addSocialize(today: NSManagedObject, social: Bool) {
         
         // TODO: need a better way to manage all this
         guard let appDelegate =
@@ -239,7 +190,7 @@ class ViewController: UIViewController {
     
     // add a double - how many hours did user sleep
     // caller is responsible for calculating this or asking user to supply it
-    func addSleepTime                                                                                                (today: NSManagedObject, hours: double_t) {
+    func addSleepTime (today: NSManagedObject, hours: Double) {
         
         // TODO: need a better way to manage all this
         guard let appDelegate =
@@ -264,7 +215,7 @@ class ViewController: UIViewController {
     }
     
     // add a boolean - did user socialize?
-    func addShower                                                                                                  (today: NSManagedObject, shower: boolean_t) {
+    func addShower (today: NSManagedObject, shower: Bool) {
         
         // TODO: need a better way to manage all this
         guard let appDelegate =
@@ -289,7 +240,7 @@ class ViewController: UIViewController {
     }
     
     // add a boolean - did user socialize?
-    func addReading                                                                                                  (today: NSManagedObject, reading: boolean_t) {
+    func addReading(today: NSManagedObject, reading: Bool) {
         
         // TODO: need a better way to manage all this
         guard let appDelegate =
@@ -314,7 +265,7 @@ class ViewController: UIViewController {
     }
     
     // add a boolean - did user socialize?
-    func addMeds                                                                                                (today: NSManagedObject, taken: boolean_t) {
+    func addMeds(today: NSManagedObject, taken: Bool) {
         
         // TODO: need a better way to manage all this
         guard let appDelegate =
@@ -339,7 +290,7 @@ class ViewController: UIViewController {
     }
     
     // add a boolean - did user socialize?
-    func addMakeBed                                                                                                  (today: NSManagedObject, made: boolean_t) {
+    func addMakeBed(today: NSManagedObject, made: Bool) {
         
         // TODO: need a better way to manage all this
         guard let appDelegate =
@@ -364,7 +315,7 @@ class ViewController: UIViewController {
     }
     
     // add a boolean - did user socialize?
-    func addFruitVeg                                                                                                 (today: NSManagedObject, eaten: boolean_t) {
+    func addFruitVeg (today: NSManagedObject, eaten: Bool) {
         
         // TODO: need a better way to manage all this
         guard let appDelegate =
@@ -389,7 +340,7 @@ class ViewController: UIViewController {
     }
     
     // add a boolean - did user socialize?
-    func addExercise                                                                                                 (today: NSManagedObject, exercise: boolean_t) {
+    func addExercise(today: NSManagedObject, exercise: Bool) {
         
         // TODO: need a better way to manage all this
         guard let appDelegate =
@@ -414,7 +365,7 @@ class ViewController: UIViewController {
     }
     
     // add a boolean - did user socialize?
-    func addCaffeine                                                                                                  (today: NSManagedObject, caff: boolean_t) {
+    func addCaffeine(today: NSManagedObject, caff: Bool) {
         
         // TODO: need a better way to manage all this
         guard let appDelegate =
@@ -439,7 +390,7 @@ class ViewController: UIViewController {
     }
     
     // add a boolean - did user socialize?
-    func addAlcohol                                                                                                (today: NSManagedObject, alcohol: boolean_t) {
+    func addAlcohol(today: NSManagedObject, alcohol: Bool) {
         
         // TODO: need a better way to manage all this
         guard let appDelegate =
@@ -463,6 +414,91 @@ class ViewController: UIViewController {
         
     }
     
+    func completeEntry(entity: NSEntityDescription, date: Date, sleepHrs: Double, water: Int, socialize: Bool, shower: Bool, reading: Bool, moodStrs: String, moodNum: Int, meds: Bool, makeBed: Bool, fruitVeg: Bool, exercise: Bool, caffeine: Bool, alcohol: Bool) {
+        
+        guard let appDelegate =
+            UIApplication.shared.delegate as? AppDelegate else {
+                return
+        }
+        
+        let managedContext =
+            appDelegate.persistentContainer.viewContext
+        
+        let today = NSManagedObject(entity: entity,
+                                    insertInto: managedContext)
+        // populate this object with all the values
+        today.setValue(alcohol, forKeyPath: "alcohol")
+        today.setValue(caffeine, forKeyPath: "caffeine")
+        today.setValue(date, forKeyPath: "date")
+        today.setValue(exercise, forKeyPath: "exercise")
+        today.setValue(fruitVeg, forKeyPath: "fruitVeg")
+        today.setValue(makeBed, forKeyPath: "makeBed")
+        today.setValue(meds, forKeyPath: "meds")
+        today.setValue(moodNum, forKeyPath: "moodNum")
+        today.setValue(moodStrs, forKeyPath: "moodStrs")
+        today.setValue(reading, forKeyPath: "reading")
+        today.setValue(shower, forKeyPath: "shower")
+        today.setValue(sleepHrs, forKeyPath: "sleep")
+        today.setValue(socialize, forKeyPath: "socialize")
+        today.setValue(water, forKeyPath: "water")
+        
+        do {
+            try managedContext.save()
+        } catch let error as NSError {
+            print("Could not save. \(error), \(error.userInfo)")
+        }
+        
+    }
+    
+    // wipe database and populate it with a set of testing data
+    func populateTestData () {
+        guard let appDelegate =
+            UIApplication.shared.delegate as? AppDelegate else {
+                return
+        }
+        
+        let managedContext =
+            appDelegate.persistentContainer.viewContext
+        
+        let entity = NSEntityDescription.entity(forEntityName: "Day", in: managedContext)!
+        
+        
+        // get training data CSV
+        do {
+            // make a date formatter for convenience
+            
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "MM/DD/YYYY"
+            dateFormatter.locale = Locale(identifier: "en_US_POSIX") // set locale to reliable US_POSIX
+            
+            let u = URL(fileURLWithPath: "trainingdata.csv")
+            
+            let s = try String(contentsOf: u)
+            // separate into lines
+            let lines: [String.SubSequence] = s.split(separator:"\n")
+            
+            // process each line
+            for l in lines {
+                // separate on commas
+                let cells: [String.SubSequence] = l.split(separator:",")
+                
+                
+               // completeEntry(entity: entity, date: dateFormatter.date(from: String(cells[0])), sleepHrs: Double(cells[3]), water: Int(cells[4]), socialize: Bool(cells[9]), shower: Bool(cells[5]), reading: Bool(cells[12]), moodStrs: String(cells[]), moodNum: Int, meds: Bool, makeBed: Bool, fruitVeg: Bool, exercise: Bool, caffeine: Bool, alcohol: Bool)
+                
+            }
+            
+        } catch {
+            print("error processing: trainingdata.csv: \(error)")
+        }
+        
+        
+        
+    }
+    
+    func processFile(at url: URL)
+    {
+       
+    }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
