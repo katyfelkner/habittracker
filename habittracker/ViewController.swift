@@ -10,7 +10,19 @@ import UIKit
 import CoreData
 
 class ViewController: UIViewController {
-
+    @IBOutlet weak var slider: UISlider!
+    
+    let mood: Int
+    let step: Int = 1
+    
+    
+    @IBAction func sliderValueChanged (sender: UISlider){
+        let step = int(sender.value / step) * step
+        sender.value = step
+        
+        
+    }
+   
     
     // array of all the days
     // for now we are loading them all into memory but this may become too big
