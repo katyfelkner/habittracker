@@ -12,13 +12,13 @@ import CoreData
 class ViewController: UIViewController {
     @IBOutlet weak var slider: UISlider!
     
-    let mood: Int
+    let mood: Int = 0
     let step: Int = 1
     
     
     @IBAction func sliderValueChanged (sender: UISlider){
-        let step = int(sender.value / step) * step
-        sender.value = step
+        let step = Int(sender.value / Float(self.step)) * self.step
+        sender.value = Float(step)
         
         
     }
