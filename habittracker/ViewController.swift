@@ -105,7 +105,7 @@ class ViewController: UIViewController {
     }
     
     // add a comma separated string of qualitative mood data for a certain day
-    func addMoodString                                                                                                   (today: NSManagedObject, moodStr: String) {
+    func addMoodString (today: NSManagedObject, moodStr: String) {
         
         // TODO: need a better way to manage all this
         guard let appDelegate =
@@ -129,7 +129,7 @@ class ViewController: UIViewController {
     }
     
     // add amount of water consumed (in ounces)
-    func addWater                                                                                                   (today: NSManagedObject, water: int_fast16_t) {
+    func addWater (today: NSManagedObject, water: int_fast16_t) {
         
         // TODO: need a better way to manage all this
         guard let appDelegate =
@@ -153,7 +153,7 @@ class ViewController: UIViewController {
     }
     
     // add wake up time in as a Date object
-    func addWakeTime                                                                                                  (today: NSManagedObject, wakeTime: Date) {
+    func addWakeTime (today: NSManagedObject, wakeTime: Date) {
         
         // TODO: need a better way to manage all this
         guard let appDelegate =
@@ -178,7 +178,7 @@ class ViewController: UIViewController {
     }
     
     // add bed time as a Date object
-    func addBedTime                                                                                                  (today: NSManagedObject, bedTime: Date) {
+    func addBedTime (today: NSManagedObject, bedTime: Date) {
         
         // TODO: need a better way to manage all this
         guard let appDelegate =
@@ -203,7 +203,7 @@ class ViewController: UIViewController {
     }
     
     // add a boolean - did user socialize?
-    func addSocialize                                                                                                  (today: NSManagedObject, social: boolean_t) {
+    func addSocialize(today: NSManagedObject, social: boolean_t) {
         
         // TODO: need a better way to manage all this
         guard let appDelegate =
@@ -229,7 +229,7 @@ class ViewController: UIViewController {
     
     // add a double - how many hours did user sleep
     // caller is responsible for calculating this or asking user to supply it
-    func addSleepTime                                                                                                (today: NSManagedObject, hours: double_t) {
+    func addSleepTime (today: NSManagedObject, hours: double_t) {
         
         // TODO: need a better way to manage all this
         guard let appDelegate =
@@ -254,7 +254,7 @@ class ViewController: UIViewController {
     }
     
     // add a boolean - did user socialize?
-    func addShower                                                                                                  (today: NSManagedObject, shower: boolean_t) {
+    func addShower (today: NSManagedObject, shower: boolean_t) {
         
         // TODO: need a better way to manage all this
         guard let appDelegate =
@@ -279,7 +279,7 @@ class ViewController: UIViewController {
     }
     
     // add a boolean - did user socialize?
-    func addReading                                                                                                  (today: NSManagedObject, reading: boolean_t) {
+    func addReading(today: NSManagedObject, reading: boolean_t) {
         
         // TODO: need a better way to manage all this
         guard let appDelegate =
@@ -304,7 +304,7 @@ class ViewController: UIViewController {
     }
     
     // add a boolean - did user socialize?
-    func addMeds                                                                                                (today: NSManagedObject, taken: boolean_t) {
+    func addMeds(today: NSManagedObject, taken: boolean_t) {
         
         // TODO: need a better way to manage all this
         guard let appDelegate =
@@ -329,7 +329,7 @@ class ViewController: UIViewController {
     }
     
     // add a boolean - did user socialize?
-    func addMakeBed                                                                                                  (today: NSManagedObject, made: boolean_t) {
+    func addMakeBed(today: NSManagedObject, made: boolean_t) {
         
         // TODO: need a better way to manage all this
         guard let appDelegate =
@@ -354,7 +354,7 @@ class ViewController: UIViewController {
     }
     
     // add a boolean - did user socialize?
-    func addFruitVeg                                                                                                 (today: NSManagedObject, eaten: boolean_t) {
+    func addFruitVeg (today: NSManagedObject, eaten: boolean_t) {
         
         // TODO: need a better way to manage all this
         guard let appDelegate =
@@ -379,7 +379,7 @@ class ViewController: UIViewController {
     }
     
     // add a boolean - did user socialize?
-    func addExercise                                                                                                 (today: NSManagedObject, exercise: boolean_t) {
+    func addExercise(today: NSManagedObject, exercise: boolean_t) {
         
         // TODO: need a better way to manage all this
         guard let appDelegate =
@@ -404,7 +404,7 @@ class ViewController: UIViewController {
     }
     
     // add a boolean - did user socialize?
-    func addCaffeine                                                                                                  (today: NSManagedObject, caff: boolean_t) {
+    func addCaffeine(today: NSManagedObject, caff: boolean_t) {
         
         // TODO: need a better way to manage all this
         guard let appDelegate =
@@ -429,7 +429,7 @@ class ViewController: UIViewController {
     }
     
     // add a boolean - did user socialize?
-    func addAlcohol                                                                                                (today: NSManagedObject, alcohol: boolean_t) {
+    func addAlcohol(today: NSManagedObject, alcohol: boolean_t) {
         
         // TODO: need a better way to manage all this
         guard let appDelegate =
@@ -453,6 +453,52 @@ class ViewController: UIViewController {
         
     }
     
+    func completeEntry(entity: NSEntityDescription, date: Date, sleepHrs: double_t, water: int_fast16_t, wakeUpTime: Date, bedTime: Date, socialize: boolean_t, shower: boolean_t, reading: boolean_t, moodStrs: String, moodNum: int_fast16_t, meds: boolean_t, makeBed: boolean_t, fruitVeg: boolean_t, exercise: boolean_t, caffeine: boolean_t, alcohol: boolean_t) {
+        guard let appDelegate =
+            UIApplication.shared.delegate as? AppDelegate else {
+                return
+        }
+        
+        let managedContext =
+            appDelegate.persistentContainer.viewContext
+        
+        let entity =
+            NSEntityDescription.entity(forEntityName: "Day",
+                                       in: managedContext)!
+        
+        let today = NSManagedObject(entity: entity,
+                                    insertInto: managedContext)
+        // populate this object with all the values
+        today.setValue(alcohol, forKeyPath: "alcohol")
+        today.setValue(bedTime, forKeyPath: "bedtime")
+        today.setValue(caffeine, forKeyPath: "caffeine")
+        today.setValue(date, forKeyPath: "date")
+        today.setValue(exercise, forKeyPath: "exercise")
+        today.setValue(fruitVeg, forKeyPath: "fruitVeg")
+        today.setValue(makeBed, forKeyPath: "makeBed")
+        today.setValue(meds, forKeyPath: "meds")
+        today.setValue(moodNum, forKeyPath: "moodNum")
+        today.setValue(moodStrs, forKeyPath: "moodStrs")
+        today.setValue(reading, forKeyPath: "reading")
+        today.setValue(shower, forKeyPath: "shower")
+        today.setValue(sleepHrs, forKeyPath: "sleep")
+        today.setValue(socialize, forKeyPath: "socialize")
+        today.setValue(wakeUpTime, forKeyPath: "wakeUpTime")
+        today.setValue(water, forKeyPath: "water")
+        
+        do {
+            try managedContext.save()
+        } catch let error as NSError {
+            print("Could not save. \(error), \(error.userInfo)")
+        }
+        
+    }
+    
+    // wipe database and populate it with a set of testing data
+    func populateTestData () {
+        
+        
+    }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
