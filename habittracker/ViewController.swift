@@ -12,13 +12,10 @@ import CoreData
 class ViewController: UIViewController {
 
     @IBOutlet weak var mood: UISegmentedControl!
-    var today: NSManagedObject?
     
     @IBAction func moodValue(_ sender: UISegmentedControl) {
 //        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        if let todaysDay = today {
-            addMoodNum(today: todaysDay, mood: sender.selectedSegmentIndex + 1)
-        }
+            addMoodNum(mood: sender.selectedSegmentIndex + 1)
     }
    
     
@@ -40,24 +37,11 @@ class ViewController: UIViewController {
             UIApplication.shared.delegate as? AppDelegate else {
                 return
         }
-        self.today = newDay()
         
-        let managedContext =
-            appDelegate.persistentContainer.viewContext
-        
-        //2
-        let fetchRequest =
-            NSFetchRequest<NSManagedObject>(entityName: "Day")
-        
-        //3
-        do {
-            days = try managedContext.fetch(fetchRequest)
-        } catch let error as NSError {
-            print("Could not fetch. \(error), \(error.userInfo)")
-        }
 //        mood.addTarget(self, action: #selector(self.moodValue(_:)), for: .valueChanged)
     }
     
+    // do we even need this method?
     func newDay() -> NSManagedObject? {
         // should be called whenever tracking for a new day is initiated
         // returns object for that day
@@ -71,17 +55,24 @@ class ViewController: UIViewController {
         // 1
         let managedContext = appDelegate.persistentContainer.viewContext
         
-        if NSEntityDescription.entity(forEntityName: "Day", in: managedContext) == nil {
-            NSEntityDescription.insertNewObject(forEntityName: "Day", into: managedContext)
-        }
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/DD/YYYY"
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX") // set locale to reliable US_POSIX
         
-        // 2
-        guard let entity = NSEntityDescription.entity(forEntityName: "Day", in: managedContext) else {
-            return nil
-        }
         
-        let today = NSManagedObject(entity: entity,
-                                    insertInto: managedContext)
+        let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Day")
+        fetch.predicate = NSPredicate(format: "date == %@", dateFormatter.string(from: Date()))
+        
+        var today: NSManagedObject
+        do {
+            let fetched = try managedContext.fetch(fetch) as! [NSManagedObject]
+            today = fetched[0]
+        }
+        catch {
+            // an entry for today doesnt exist, so we need to create one
+            today = NSEntityDescription.insertNewObject(forEntityName: "Day", into: managedContext)
+
+        }
         
         // 3
         today.setValue(NSDate(), forKeyPath: "date")
@@ -89,7 +80,6 @@ class ViewController: UIViewController {
         // 4
         do {
             try managedContext.save()
-            days.append(today)
         } catch let error as NSError {
             print("Could not save. \(error), \(error.userInfo)")
         }
@@ -98,22 +88,48 @@ class ViewController: UIViewController {
     }
     
     // add a numerical mood entry to an existing day
-    func addMoodNum(today: NSManagedObject, mood: Int) {
+    func addMoodNum(mood: Int) {
         
-        guard let appDelegate =
-            UIApplication.shared.delegate as? AppDelegate else {
-                return
+        guard let appDelegate = UIApplication.shared.delegate as! AppDelegate? else {
+            return
         }
         
-        let managedContext =
-            appDelegate.persistentContainer.viewContext
+        // 1
+        let managedContext = appDelegate.persistentContainer.viewContext
         
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/DD/YYYY"
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX") // set locale to reliable US_POSIX
+
+ 
+        let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Day")
+        fetch.predicate = NSPredicate(format: "date == %@", dateFormatter.string(from: Date()))
+        
+        var today: NSManagedObject
+        do {
+            let fetched = try managedContext.fetch(fetch) as! [NSManagedObject]
+            if (fetched.count == 0) {
+                print("found an entry for today")
+                today = NSEntityDescription.insertNewObject(forEntityName: "Day", into: managedContext)
+            }
+            else {
+                print("creating an entry for today")
+                today = fetched[0]
+            }
+            
+        }
+        catch {
+            // an entry for today doesnt exist, so we need to create one
+            today = NSEntityDescription.insertNewObject(forEntityName: "Day", into: managedContext)
+        }
+        
+        // 3
         today.setValue(mood, forKeyPath: "moodNum")
         
+        // 4
         do {
             try managedContext.save()
-            //days.append(today)
-            // TODO: should we deal with an array in local memory here?
         } catch let error as NSError {
             print("Could not save. \(error), \(error.userInfo)")
         }
@@ -121,47 +137,96 @@ class ViewController: UIViewController {
     }
     
     // add a comma separated string of qualitative mood data for a certain day
-    func addMoodString (today: NSManagedObject, moodStr: String) {
+    func addMoodString (moodStr: String) {
         
-        // TODO: need a better way to manage all this
-        guard let appDelegate =
-            UIApplication.shared.delegate as? AppDelegate else {
-                return
+        guard let appDelegate = UIApplication.shared.delegate as! AppDelegate? else {
+            return
         }
         
-        let managedContext =
-            appDelegate.persistentContainer.viewContext
+        // 1
+        let managedContext = appDelegate.persistentContainer.viewContext
         
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/DD/YYYY"
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX") // set locale to reliable US_POSIX
+        
+        
+        let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Day")
+        fetch.predicate = NSPredicate(format: "date == %@", dateFormatter.string(from: Date()))
+        
+        var today: NSManagedObject
+        do {
+            let fetched = try managedContext.fetch(fetch) as! [NSManagedObject]
+            if (fetched.count == 0) {
+                print("found an entry for today")
+                today = NSEntityDescription.insertNewObject(forEntityName: "Day", into: managedContext)
+            }
+            else {
+                print("creating an entry for today")
+                today = fetched[0]
+            }
+            
+        }
+        catch {
+            // an entry for today doesnt exist, so we need to create one
+            today = NSEntityDescription.insertNewObject(forEntityName: "Day", into: managedContext)
+        }
+        
+        // 3
         today.setValue(moodStr, forKeyPath: "moodStrs")
         
+        // 4
         do {
             try managedContext.save()
-            //days.append(today)
-            // TODO: should we deal with an array in local memory here?
         } catch let error as NSError {
             print("Could not save. \(error), \(error.userInfo)")
         }
-        
     }
     
     // add amount of water consumed (in ounces)
     func addWater (today: NSManagedObject, water: Int) {
         
-        // TODO: need a better way to manage all this
-        guard let appDelegate =
-            UIApplication.shared.delegate as? AppDelegate else {
-                return
+        guard let appDelegate = UIApplication.shared.delegate as! AppDelegate? else {
+            return
         }
         
-        let managedContext =
-            appDelegate.persistentContainer.viewContext
+        // 1
+        let managedContext = appDelegate.persistentContainer.viewContext
         
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/DD/YYYY"
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX") // set locale to reliable US_POSIX
+        
+        
+        let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Day")
+        fetch.predicate = NSPredicate(format: "date == %@", dateFormatter.string(from: Date()))
+        
+        var today: NSManagedObject
+        do {
+            let fetched = try managedContext.fetch(fetch) as! [NSManagedObject]
+            if (fetched.count == 0) {
+                print("found an entry for today")
+                today = NSEntityDescription.insertNewObject(forEntityName: "Day", into: managedContext)
+            }
+            else {
+                print("creating an entry for today")
+                today = fetched[0]
+            }
+            
+        }
+        catch {
+            // an entry for today doesnt exist, so we need to create one
+            today = NSEntityDescription.insertNewObject(forEntityName: "Day", into: managedContext)
+        }
+        
+        // 3
         today.setValue(water, forKeyPath: "water")
         
+        // 4
         do {
             try managedContext.save()
-            //days.append(today)
-            // TODO: should we deal with an array in local memory here?
         } catch let error as NSError {
             print("Could not save. \(error), \(error.userInfo)")
         }
@@ -169,24 +234,48 @@ class ViewController: UIViewController {
     }
     
     // add a boolean - did user socialize?
-    func addSocialize(today: NSManagedObject, social: Bool) {
+    func addSocialize(social: Bool) {
         
-        // TODO: need a better way to manage all this
-        guard let appDelegate =
-            UIApplication.shared.delegate as? AppDelegate else {
-                return
+        guard let appDelegate = UIApplication.shared.delegate as! AppDelegate? else {
+            return
         }
         
-        let managedContext =
-            appDelegate.persistentContainer.viewContext
+        // 1
+        let managedContext = appDelegate.persistentContainer.viewContext
+        
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/DD/YYYY"
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX") // set locale to reliable US_POSIX
+        
+        
+        let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Day")
+        fetch.predicate = NSPredicate(format: "date == %@", dateFormatter.string(from: Date()))
+        
+        var today: NSManagedObject
+        do {
+            let fetched = try managedContext.fetch(fetch) as! [NSManagedObject]
+            if (fetched.count == 0) {
+                print("found an entry for today")
+                today = NSEntityDescription.insertNewObject(forEntityName: "Day", into: managedContext)
+            }
+            else {
+                print("creating an entry for today")
+                today = fetched[0]
+            }
+            
+        }
+        catch {
+            // an entry for today doesnt exist, so we need to create one
+            today = NSEntityDescription.insertNewObject(forEntityName: "Day", into: managedContext)
+        }
         
         // 3
         today.setValue(social, forKeyPath: "socialize")
         
+        // 4
         do {
             try managedContext.save()
-            //days.append(today)
-            // TODO: should we deal with an array in local memory here?
         } catch let error as NSError {
             print("Could not save. \(error), \(error.userInfo)")
         }
@@ -195,24 +284,48 @@ class ViewController: UIViewController {
     
     // add a double - how many hours did user sleep
     // caller is responsible for calculating this or asking user to supply it
-    func addSleepTime (today: NSManagedObject, hours: Double) {
+    func addSleepTime (hours: Double) {
         
-        // TODO: need a better way to manage all this
-        guard let appDelegate =
-            UIApplication.shared.delegate as? AppDelegate else {
-                return
+        guard let appDelegate = UIApplication.shared.delegate as! AppDelegate? else {
+            return
         }
         
-        let managedContext =
-            appDelegate.persistentContainer.viewContext
+        // 1
+        let managedContext = appDelegate.persistentContainer.viewContext
+        
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/DD/YYYY"
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX") // set locale to reliable US_POSIX
+        
+        
+        let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Day")
+        fetch.predicate = NSPredicate(format: "date == %@", dateFormatter.string(from: Date()))
+        
+        var today: NSManagedObject
+        do {
+            let fetched = try managedContext.fetch(fetch) as! [NSManagedObject]
+            if (fetched.count == 0) {
+                print("found an entry for today")
+                today = NSEntityDescription.insertNewObject(forEntityName: "Day", into: managedContext)
+            }
+            else {
+                print("creating an entry for today")
+                today = fetched[0]
+            }
+            
+        }
+        catch {
+            // an entry for today doesnt exist, so we need to create one
+            today = NSEntityDescription.insertNewObject(forEntityName: "Day", into: managedContext)
+        }
         
         // 3
-        today.setValue(hours, forKeyPath: "sleep")
+        today.setValue(hours, forKeyPath: "Double")
         
+        // 4
         do {
             try managedContext.save()
-            //days.append(today)
-            // TODO: should we deal with an array in local memory here?
         } catch let error as NSError {
             print("Could not save. \(error), \(error.userInfo)")
         }
@@ -220,24 +333,48 @@ class ViewController: UIViewController {
     }
     
     // add a boolean - did user socialize?
-    func addShower (today: NSManagedObject, shower: Bool) {
+    func addShower (shower: Bool) {
         
-        // TODO: need a better way to manage all this
-        guard let appDelegate =
-            UIApplication.shared.delegate as? AppDelegate else {
-                return
+        guard let appDelegate = UIApplication.shared.delegate as! AppDelegate? else {
+            return
         }
         
-        let managedContext =
-            appDelegate.persistentContainer.viewContext
+        // 1
+        let managedContext = appDelegate.persistentContainer.viewContext
+        
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/DD/YYYY"
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX") // set locale to reliable US_POSIX
+        
+        
+        let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Day")
+        fetch.predicate = NSPredicate(format: "date == %@", dateFormatter.string(from: Date()))
+        
+        var today: NSManagedObject
+        do {
+            let fetched = try managedContext.fetch(fetch) as! [NSManagedObject]
+            if (fetched.count == 0) {
+                print("found an entry for today")
+                today = NSEntityDescription.insertNewObject(forEntityName: "Day", into: managedContext)
+            }
+            else {
+                print("creating an entry for today")
+                today = fetched[0]
+            }
+            
+        }
+        catch {
+            // an entry for today doesnt exist, so we need to create one
+            today = NSEntityDescription.insertNewObject(forEntityName: "Day", into: managedContext)
+        }
         
         // 3
         today.setValue(shower, forKeyPath: "shower")
         
+        // 4
         do {
             try managedContext.save()
-            //days.append(today)
-            // TODO: should we deal with an array in local memory here?
         } catch let error as NSError {
             print("Could not save. \(error), \(error.userInfo)")
         }
@@ -245,24 +382,48 @@ class ViewController: UIViewController {
     }
     
     // add a boolean - did user socialize?
-    func addReading(today: NSManagedObject, reading: Bool) {
+    func addReading(reading: Bool) {
         
-        // TODO: need a better way to manage all this
-        guard let appDelegate =
-            UIApplication.shared.delegate as? AppDelegate else {
-                return
+        guard let appDelegate = UIApplication.shared.delegate as! AppDelegate? else {
+            return
         }
         
-        let managedContext =
-            appDelegate.persistentContainer.viewContext
+        // 1
+        let managedContext = appDelegate.persistentContainer.viewContext
+        
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/DD/YYYY"
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX") // set locale to reliable US_POSIX
+        
+        
+        let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Day")
+        fetch.predicate = NSPredicate(format: "date == %@", dateFormatter.string(from: Date()))
+        
+        var today: NSManagedObject
+        do {
+            let fetched = try managedContext.fetch(fetch) as! [NSManagedObject]
+            if (fetched.count == 0) {
+                print("found an entry for today")
+                today = NSEntityDescription.insertNewObject(forEntityName: "Day", into: managedContext)
+            }
+            else {
+                print("creating an entry for today")
+                today = fetched[0]
+            }
+            
+        }
+        catch {
+            // an entry for today doesnt exist, so we need to create one
+            today = NSEntityDescription.insertNewObject(forEntityName: "Day", into: managedContext)
+        }
         
         // 3
         today.setValue(reading, forKeyPath: "reading")
         
+        // 4
         do {
             try managedContext.save()
-            //days.append(today)
-            // TODO: should we deal with an array in local memory here?
         } catch let error as NSError {
             print("Could not save. \(error), \(error.userInfo)")
         }
@@ -270,24 +431,48 @@ class ViewController: UIViewController {
     }
     
     // add a boolean - did user socialize?
-    func addMeds(today: NSManagedObject, taken: Bool) {
+    func addMeds(taken: Bool) {
         
-        // TODO: need a better way to manage all this
-        guard let appDelegate =
-            UIApplication.shared.delegate as? AppDelegate else {
-                return
+        guard let appDelegate = UIApplication.shared.delegate as! AppDelegate? else {
+            return
         }
         
-        let managedContext =
-            appDelegate.persistentContainer.viewContext
+        // 1
+        let managedContext = appDelegate.persistentContainer.viewContext
+        
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/DD/YYYY"
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX") // set locale to reliable US_POSIX
+        
+        
+        let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Day")
+        fetch.predicate = NSPredicate(format: "date == %@", dateFormatter.string(from: Date()))
+        
+        var today: NSManagedObject
+        do {
+            let fetched = try managedContext.fetch(fetch) as! [NSManagedObject]
+            if (fetched.count == 0) {
+                print("found an entry for today")
+                today = NSEntityDescription.insertNewObject(forEntityName: "Day", into: managedContext)
+            }
+            else {
+                print("creating an entry for today")
+                today = fetched[0]
+            }
+            
+        }
+        catch {
+            // an entry for today doesnt exist, so we need to create one
+            today = NSEntityDescription.insertNewObject(forEntityName: "Day", into: managedContext)
+        }
         
         // 3
         today.setValue(taken, forKeyPath: "meds")
         
+        // 4
         do {
             try managedContext.save()
-            //days.append(today)
-            // TODO: should we deal with an array in local memory here?
         } catch let error as NSError {
             print("Could not save. \(error), \(error.userInfo)")
         }
@@ -295,24 +480,48 @@ class ViewController: UIViewController {
     }
     
     // add a boolean - did user socialize?
-    func addMakeBed(today: NSManagedObject, made: Bool) {
+    func addMakeBed(made: Bool) {
         
-        // TODO: need a better way to manage all this
-        guard let appDelegate =
-            UIApplication.shared.delegate as? AppDelegate else {
-                return
+        guard let appDelegate = UIApplication.shared.delegate as! AppDelegate? else {
+            return
         }
         
-        let managedContext =
-            appDelegate.persistentContainer.viewContext
+        // 1
+        let managedContext = appDelegate.persistentContainer.viewContext
+        
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/DD/YYYY"
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX") // set locale to reliable US_POSIX
+        
+        
+        let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Day")
+        fetch.predicate = NSPredicate(format: "date == %@", dateFormatter.string(from: Date()))
+        
+        var today: NSManagedObject
+        do {
+            let fetched = try managedContext.fetch(fetch) as! [NSManagedObject]
+            if (fetched.count == 0) {
+                print("found an entry for today")
+                today = NSEntityDescription.insertNewObject(forEntityName: "Day", into: managedContext)
+            }
+            else {
+                print("creating an entry for today")
+                today = fetched[0]
+            }
+            
+        }
+        catch {
+            // an entry for today doesnt exist, so we need to create one
+            today = NSEntityDescription.insertNewObject(forEntityName: "Day", into: managedContext)
+        }
         
         // 3
         today.setValue(made, forKeyPath: "makeBed")
         
+        // 4
         do {
             try managedContext.save()
-            //days.append(today)
-            // TODO: should we deal with an array in local memory here?
         } catch let error as NSError {
             print("Could not save. \(error), \(error.userInfo)")
         }
@@ -320,24 +529,48 @@ class ViewController: UIViewController {
     }
     
     // add a boolean - did user socialize?
-    func addFruitVeg (today: NSManagedObject, eaten: Bool) {
+    func addFruitVeg (eaten: Bool) {
         
-        // TODO: need a better way to manage all this
-        guard let appDelegate =
-            UIApplication.shared.delegate as? AppDelegate else {
-                return
+        guard let appDelegate = UIApplication.shared.delegate as! AppDelegate? else {
+            return
         }
         
-        let managedContext =
-            appDelegate.persistentContainer.viewContext
+        // 1
+        let managedContext = appDelegate.persistentContainer.viewContext
+        
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/DD/YYYY"
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX") // set locale to reliable US_POSIX
+        
+        
+        let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Day")
+        fetch.predicate = NSPredicate(format: "date == %@", dateFormatter.string(from: Date()))
+        
+        var today: NSManagedObject
+        do {
+            let fetched = try managedContext.fetch(fetch) as! [NSManagedObject]
+            if (fetched.count == 0) {
+                print("found an entry for today")
+                today = NSEntityDescription.insertNewObject(forEntityName: "Day", into: managedContext)
+            }
+            else {
+                print("creating an entry for today")
+                today = fetched[0]
+            }
+            
+        }
+        catch {
+            // an entry for today doesnt exist, so we need to create one
+            today = NSEntityDescription.insertNewObject(forEntityName: "Day", into: managedContext)
+        }
         
         // 3
         today.setValue(eaten, forKeyPath: "fruitVeg")
         
+        // 4
         do {
             try managedContext.save()
-            //days.append(today)
-            // TODO: should we deal with an array in local memory here?
         } catch let error as NSError {
             print("Could not save. \(error), \(error.userInfo)")
         }
@@ -345,24 +578,48 @@ class ViewController: UIViewController {
     }
     
     // add a boolean - did user socialize?
-    func addExercise(today: NSManagedObject, exercise: Bool) {
+    func addExercise(exercise: Bool) {
         
-        // TODO: need a better way to manage all this
-        guard let appDelegate =
-            UIApplication.shared.delegate as? AppDelegate else {
-                return
+        guard let appDelegate = UIApplication.shared.delegate as! AppDelegate? else {
+            return
         }
         
-        let managedContext =
-            appDelegate.persistentContainer.viewContext
+        // 1
+        let managedContext = appDelegate.persistentContainer.viewContext
+        
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/DD/YYYY"
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX") // set locale to reliable US_POSIX
+        
+        
+        let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Day")
+        fetch.predicate = NSPredicate(format: "date == %@", dateFormatter.string(from: Date()))
+        
+        var today: NSManagedObject
+        do {
+            let fetched = try managedContext.fetch(fetch) as! [NSManagedObject]
+            if (fetched.count == 0) {
+                print("found an entry for today")
+                today = NSEntityDescription.insertNewObject(forEntityName: "Day", into: managedContext)
+            }
+            else {
+                print("creating an entry for today")
+                today = fetched[0]
+            }
+            
+        }
+        catch {
+            // an entry for today doesnt exist, so we need to create one
+            today = NSEntityDescription.insertNewObject(forEntityName: "Day", into: managedContext)
+        }
         
         // 3
         today.setValue(exercise, forKeyPath: "exercise")
         
+        // 4
         do {
             try managedContext.save()
-            //days.append(today)
-            // TODO: should we deal with an array in local memory here?
         } catch let error as NSError {
             print("Could not save. \(error), \(error.userInfo)")
         }
@@ -370,24 +627,48 @@ class ViewController: UIViewController {
     }
     
     // add a boolean - did user socialize?
-    func addCaffeine(today: NSManagedObject, caff: Bool) {
+    func addCaffeine(caff: Bool) {
         
-        // TODO: need a better way to manage all this
-        guard let appDelegate =
-            UIApplication.shared.delegate as? AppDelegate else {
-                return
+        guard let appDelegate = UIApplication.shared.delegate as! AppDelegate? else {
+            return
         }
         
-        let managedContext =
-            appDelegate.persistentContainer.viewContext
+        // 1
+        let managedContext = appDelegate.persistentContainer.viewContext
+        
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/DD/YYYY"
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX") // set locale to reliable US_POSIX
+        
+        
+        let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Day")
+        fetch.predicate = NSPredicate(format: "date == %@", dateFormatter.string(from: Date()))
+        
+        var today: NSManagedObject
+        do {
+            let fetched = try managedContext.fetch(fetch) as! [NSManagedObject]
+            if (fetched.count == 0) {
+                print("found an entry for today")
+                today = NSEntityDescription.insertNewObject(forEntityName: "Day", into: managedContext)
+            }
+            else {
+                print("creating an entry for today")
+                today = fetched[0]
+            }
+            
+        }
+        catch {
+            // an entry for today doesnt exist, so we need to create one
+            today = NSEntityDescription.insertNewObject(forEntityName: "Day", into: managedContext)
+        }
         
         // 3
         today.setValue(caff, forKeyPath: "caffeine")
         
+        // 4
         do {
             try managedContext.save()
-            //days.append(today)
-            // TODO: should we deal with an array in local memory here?
         } catch let error as NSError {
             print("Could not save. \(error), \(error.userInfo)")
         }
@@ -395,28 +676,51 @@ class ViewController: UIViewController {
     }
     
     // add a boolean - did user socialize?
-    func addAlcohol(today: NSManagedObject, alcohol: Bool) {
+    func addAlcohol(alcohol: Bool) {
         
-        // TODO: need a better way to manage all this
-        guard let appDelegate =
-            UIApplication.shared.delegate as? AppDelegate else {
-                return
+        guard let appDelegate = UIApplication.shared.delegate as! AppDelegate? else {
+            return
         }
         
-        let managedContext =
-            appDelegate.persistentContainer.viewContext
+        // 1
+        let managedContext = appDelegate.persistentContainer.viewContext
+        
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM/DD/YYYY"
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX") // set locale to reliable US_POSIX
+        
+        
+        let fetch = NSFetchRequest<NSFetchRequestResult>(entityName: "Day")
+        fetch.predicate = NSPredicate(format: "date == %@", dateFormatter.string(from: Date()))
+        
+        var today: NSManagedObject
+        do {
+            let fetched = try managedContext.fetch(fetch) as! [NSManagedObject]
+            if (fetched.count == 0) {
+                print("found an entry for today")
+                today = NSEntityDescription.insertNewObject(forEntityName: "Day", into: managedContext)
+            }
+            else {
+                print("creating an entry for today")
+                today = fetched[0]
+            }
+            
+        }
+        catch {
+            // an entry for today doesnt exist, so we need to create one
+            today = NSEntityDescription.insertNewObject(forEntityName: "Day", into: managedContext)
+        }
         
         // 3
         today.setValue(alcohol, forKeyPath: "alcohol")
         
+        // 4
         do {
             try managedContext.save()
-            //days.append(today)
-            // TODO: should we deal with an array in local memory here?
         } catch let error as NSError {
             print("Could not save. \(error), \(error.userInfo)")
         }
-        
     }
     
     func completeEntry(entity: NSEntityDescription, date: Date, sleepHrs: Double, water: Int, socialize: Bool, shower: Bool, reading: Bool, moodStrs: String, moodNum: Int, meds: Bool, makeBed: Bool, fruitVeg: Bool, exercise: Bool, caffeine: Bool, alcohol: Bool) {

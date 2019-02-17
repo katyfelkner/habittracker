@@ -3,7 +3,7 @@
     <entity name="Day" representedClassName="Day" syncable="YES" codeGenerationType="class">
         <attribute name="alcohol" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="caffeine" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
-        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO" syncable="YES"/>
+        <attribute name="date" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="exercise" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="fruitVeg" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="makeBed" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
