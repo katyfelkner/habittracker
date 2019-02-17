@@ -8,25 +8,67 @@
 
 import UIKit
 import CoreData
+import CoreML
 
 class ViewController: UIViewController {
    
 
     @IBOutlet weak var mood: UISegmentedControl!
+    @IBOutlet weak var textField: UITextField!
 
-    
-    @IBAction func moodValue(_ sender: UISegmentedControl) {
-//        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            addMoodNum(mood: sender.selectedSegmentIndex + 1)
+    @IBOutlet weak var label: UILabel!
+    @IBAction func stepperPressed(_ stepper: UIStepper) {
+        label.text = String (stepper.value)
     }
-
     
     // array of all the days
     // for now we are loading them all into memory but this may become too big
     var days: [NSManagedObject] = []
     override func viewDidLoad() {
         super.viewDidLoad()
-        // TODO: put in a title
+        
+        // sample ML predictions
+        let model = Regression2()
+        //let inputWater = MLMultiArray(2.0, 90.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0)
+        //let inputSleep = MLMultiArray(3.0, 80.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0)
+        //let inputExercise = MLMultiArray(2.0, 80.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0)
+        
+        do {
+            let input = try MLMultiArray.init(shape: [11], dataType:.double)
+            input[0] = 2.0
+            input[1] = 80.0
+            input[2] = 0.0
+            input[3] = 0.0
+            input[4] = 0.0
+            input[5] = 0.0
+            input[6] = 1.0
+            input[7] = 0.0
+            input[8] = 8.0
+            input[9] = 0.0
+            input[10] = 0.0
+            
+            // predict with more water
+            input[1] = 90.0
+            let outputWater = try model.prediction(input: input)
+            print(outputWater.featureNames)
+            //print(outputWater.featureValue(for: outputWater.featureNames["output"]))
+            print(outputWater.featureValue(for: "output")!.doubleValue)
+            
+            // predict with more sleep
+            input[1] = 80.0
+            input[0] = 3.0
+            var outputSleep = try model.prediction(input: input)
+            print("sleep output:" + (outputSleep.featureValue(for: "output")?.stringValue)!)
+            
+            // predict with more exercise
+            input[7] = 1.0
+            input[0] = 2.0
+            var outputExercise = try model.prediction(input: input)
+            print("exercise output:" + (outputExercise.featureValue(for: "output")?.stringValue)!)
+            
+        } catch {
+            print("unexpected ML error")
+        }
     
         
        
@@ -832,24 +874,90 @@ class ViewController: UIViewController {
     
     @IBAction func bedTracker(_ sender: UISegmentedControl) {
         if sender.selectedSegmentIndex == 0 {
-            addShower(makeBed: false)
+            addMakeBed(made: false)
         }
         else {
-            addShower(makeBed: true)
-    }
+            addMakeBed(made: true)
+        }
     }
 
+  
+    @IBAction func alcTracker(_ sender: UISegmentedControl) {
+        if sender.selectedSegmentIndex == 0 {
+            addAlcohol(alcohol: false)
+        }
+        else {
+            addAlcohol(alcohol: true)
+        }
+    }
     
+    @IBAction func caffTracker(_ sender: UISegmentedControl) {
+        if sender.selectedSegmentIndex == 0 {
+            addCaffeine(caff: false)
+        }
+        else {
+            addCaffeine(caff: true)
+        }
+    }
     
+    @IBAction func socTracker(_ sender: UISegmentedControl) {
+        if sender.selectedSegmentIndex == 0 {
+            addSocialize(social: false)
+        }
+        else {
+            addSocialize(social: true)
+        }
+    }
 
+    @IBAction func exerciseTracker(_ sender: UISegmentedControl) {
+        if sender.selectedSegmentIndex == 0 {
+            addExercise(exercise: false)
+        }
+        else {
+            addExercise(exercise: true)
+        }
+    }
     
+    @IBAction func medTracker(_ sender: UISegmentedControl) {
+        if sender.selectedSegmentIndex == 0 {
+            addMeds(taken: false)
+        }
+        else {
+            addMeds(taken: true)
+        }
+    }
     
-    // all these functions control the back end of the app - updating CoreData table
+    @IBAction func readTracker(_ sender: UISegmentedControl) {
+        if sender.selectedSegmentIndex == 0 {
+            addReading(reading: false)
+        }
+        else {
+            addReading(reading: true)
+        }
+    }
+    
+    @IBAction func  vegTracker(_ sender: UISegmentedControl) {
+        if sender.selectedSegmentIndex == 0 {
+            addFruitVeg(eaten: false)
+        }
+        else {
+            addFruitVeg(eaten: true)
+        }
+    }
+    
+    @IBAction func textFieldDidEndEditing(_ textField: UITextField) {
+        guard let myText = textField.text else {
+            return
+        }
+        addSleepTime(hours: Double(myText)!)
+    }
+    
+    @IBAction func textFieldShouldReturn(textField: UITextField) {
+        textField.resignFirstResponder()
+        return
+    }
 }
 
 class TrackerViewController: UIViewController {
-    @IBOutlet weak var label: UILabel!
-    @IBAction func stepperPressed(_ stepper: UIStepper) {
-        label.text = String (stepper.value)
-}
+    
 }

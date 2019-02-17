@@ -14,6 +14,7 @@
 		4A4AA9032218798800900436 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4A4AA9012218798800900436 /* LaunchScreen.storyboard */; };
 		4A4AA92D22189DAF00900436 /* habittracker.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 4A4AA92B22189DAF00900436 /* habittracker.xcdatamodeld */; };
 		4A81BE1F2218B9AA00902EB6 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4A4AA9042218798800900436 /* Info.plist */; };
+		4AB73B252219C85400C3E2AB /* Regression2.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 4AB73B242219C85300C3E2AB /* Regression2.mlmodel */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,6 +26,7 @@
 		4A4AA9022218798800900436 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		4A4AA9042218798800900436 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4A4AA92C22189DAF00900436 /* habittracker.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = habittracker.xcdatamodel; sourceTree = "<group>"; };
+		4AB73B242219C85300C3E2AB /* Regression2.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; name = Regression2.mlmodel; path = ../../../../Downloads/Regression2.mlmodel; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +64,7 @@
 				4A4AA8FA2218798800900436 /* ViewController.swift */,
 				4A4AA8FC2218798800900436 /* Main.storyboard */,
 				4A4AA8FF2218798800900436 /* Assets.xcassets */,
+				4AB73B242219C85300C3E2AB /* Regression2.mlmodel */,
 				4A4AA9012218798800900436 /* LaunchScreen.storyboard */,
 				4A4AA9042218798800900436 /* Info.plist */,
 			);
@@ -143,6 +146,7 @@
 			files = (
 				4A4AA92D22189DAF00900436 /* habittracker.xcdatamodeld in Sources */,
 				4A4AA8FB2218798800900436 /* ViewController.swift in Sources */,
+				4AB73B252219C85400C3E2AB /* Regression2.mlmodel in Sources */,
 				4A4AA8F92218798800900436 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
