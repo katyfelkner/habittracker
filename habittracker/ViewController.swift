@@ -12,7 +12,7 @@ import CoreML
 
 class ViewController: UIViewController {
    
-
+    
     @IBOutlet weak var mood: UISegmentedControl!
     @IBOutlet weak var textField: UITextField!
 
@@ -35,36 +35,36 @@ class ViewController: UIViewController {
         
         do {
             let input = try MLMultiArray.init(shape: [11], dataType:.double)
-            input[0] = 2.0
-            input[1] = 80.0
-            input[2] = 0.0
+            input[0] = 6.0
+            input[1] = 20.0
+            input[2] = 1.0
             input[3] = 0.0
             input[4] = 0.0
-            input[5] = 0.0
+            input[5] = 1.0
             input[6] = 1.0
             input[7] = 0.0
-            input[8] = 8.0
+            input[8] = 1.0
             input[9] = 0.0
             input[10] = 0.0
             
             // predict with more water
-            input[1] = 90.0
+            input[1] = 30.0
             let outputWater = try model.prediction(input: input)
-            print(outputWater.featureNames)
+            //print(outputWater.featureNames)
             //print(outputWater.featureValue(for: outputWater.featureNames["output"]))
-            print(outputWater.featureValue(for: "output")!.doubleValue)
+            print(outputWater.featureValue(for: "output")?.multiArrayValue![0] ?? 100)
             
             // predict with more sleep
-            input[1] = 80.0
-            input[0] = 3.0
+            input[1] = 20.0
+            input[0] = 7.0
             var outputSleep = try model.prediction(input: input)
-            print("sleep output:" + (outputSleep.featureValue(for: "output")?.stringValue)!)
+            print(outputSleep.featureValue(for: "output")?.multiArrayValue![0] ?? 100)
             
             // predict with more exercise
             input[7] = 1.0
-            input[0] = 2.0
+            input[0] = 6.0
             var outputExercise = try model.prediction(input: input)
-            print("exercise output:" + (outputExercise.featureValue(for: "output")?.stringValue)!)
+            print(outputExercise.featureValue(for: "output")?.multiArrayValue![0] ?? 100)
             
         } catch {
             print("unexpected ML error")
