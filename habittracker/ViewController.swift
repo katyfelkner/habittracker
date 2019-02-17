@@ -10,6 +10,7 @@ import UIKit
 import CoreData
 
 class ViewController: UIViewController {
+
     @IBOutlet weak var slider: UISlider!
     
     let mood: Int = 0
@@ -30,6 +31,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // TODO: put in a title
+    
         
        
     }
@@ -62,7 +64,12 @@ class ViewController: UIViewController {
         // should be called whenever tracking for a new day is initiated
         // returns object for that day
         // this object is then passed to other methods to add data to the day
+<<<<<<< HEAD
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
+=======
+        //guard let appDelegate =
+            //UIApplication.shared.delegate as! AppDelegate
+>>>>>>> 2504681fa5028f7fee542f049b45362675ba56ef
         
         // 1
         let managedContext =
